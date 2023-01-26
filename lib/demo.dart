@@ -2,7 +2,7 @@
 Name: main.dart
 Description: Startup page for the Bronco Safe Application on all platforms
 DMOD: 1/26/23
-*/ 
+*/
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,6 +34,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/*
+How Flutter works: Widgets
+Here we have a stateful widget, which differs from a Stateless widget only in 
+that a Stateful Widget has element in it that use data that changes (those vars
+are called the "state").
+*/
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -52,6 +58,9 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+/*
+this is where that state is defined, in this case it only has one var _counter
+ */
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
@@ -118,3 +127,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+/*
+This looks really complicated, but in reality it is quite similar to HTML tags
+the beauty  of Flutter is that it lets us code both our functionality (through
+state and widget builders) as well as our front end together.
+ */
