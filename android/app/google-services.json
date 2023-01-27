@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "946275082988",
+    "firebase_url": "https://bronco-safe-default-rtdb.firebaseio.com",
+    "project_id": "bronco-safe",
+    "storage_bucket": "bronco-safe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946275082988:android:75883c653c5a4f99043bc9",
+        "android_client_info": {
+          "package_name": "com.example.bronco_safe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "946275082988-8ns1i0f5erok9gh43gu1oa3suanlg026.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK8TZ_E9IBOi_Dct6LGMnM1E2y6FzBeeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "946275082988-8ns1i0f5erok9gh43gu1oa3suanlg026.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
