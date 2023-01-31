@@ -1,42 +1,45 @@
-import 'package:bronco_safe/firebase_helpers.dart';
+import 'dart:html';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class _LoginPageState extends State<LoginPage> {
+import 'firebase_helpers.dart';
+
+class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async => false,
-        child: Scaffold(
-          appBar: AppBar(title: const Text("Login")),
-          body: const Card(
-            child: LoginForm(),
-          ),
-        ));
+    return Scaffold(
+      appBar: AppBar(title: const Text("Signup")),
+      body: Column(
+        children: <Widget>[SignupForm()],
+      ),
+    );
   }
 }
 
-//state object
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
 // Create a Form widget.
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class SignupForm extends StatefulWidget {
+  const SignupForm({super.key});
 
   @override
-  LoginFormState createState() {
-    return LoginFormState();
+  SignupFormState createState() {
+    return SignupFormState();
   }
 }
 
 //form state
-class LoginFormState extends State<LoginForm> {
+class SignupFormState extends State<SignupForm> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController fNameController = TextEditingController();
+  final TextEditingController lNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
 
@@ -47,7 +50,29 @@ class LoginFormState extends State<LoginForm> {
         child: Column(
           children: <Widget>[
             const ListTile(
-              title: Text("BroncoSafe Login"),
+              title: Text("BroncoSafe Signup"),
+            ),
+            TextFormField(
+              controller: fNameController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'please enter a name';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(), hintText: "First Name"),
+            ),
+            TextFormField(
+              controller: lNameController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'please enter a name';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(), hintText: "Last Name"),
             ),
             TextFormField(
               controller: emailController,
@@ -78,21 +103,19 @@ class LoginFormState extends State<LoginForm> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     //firebase code
+                    String fName = fNameController.text.toString();
+                    String lName = lNameController.text.toString();
                     String email = emailController.text.toString();
                     String pass = passController.text.toString();
 
-                    if (await FirebaseHelpers.authUser(email, pass)) {
+                    if (await FirebaseHelpers.createUser(
+                            fName, lName, email, pass) ==
+                        "success") {
                       Navigator.popAndPushNamed(context, "/");
                     }
                   }
                 },
-                child: Text("Login")),
-            ElevatedButton(
-              child: Text("Signup instead"),
-              onPressed: () => {
-                Navigator.popAndPushNamed(context, "/signup")
-              },
-            )
+                child: Text("Signup"))
           ],
         ));
   }
@@ -100,6 +123,8 @@ class LoginFormState extends State<LoginForm> {
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
+    fNameController.dispose();
+    lNameController.dispose();
     emailController.dispose();
     passController.dispose();
     super.dispose();

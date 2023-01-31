@@ -1,4 +1,8 @@
 //TODO: Verify cpp email address
+// TODO: add a warning for people to not use their CPP passwords, and an un
+//affiliated notice
+
+import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +44,7 @@ class FirebaseHelpers {
       final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      //this can be replaced with text code, Text() elements, etc and return a 
+      //this can be replaced with text code, Text() elements, etc and return a
       // dynamic type
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -52,5 +56,29 @@ class FirebaseHelpers {
     }
 
     return state;
+  }
+
+  static Future<String> createUser(
+      String fName, String lName, String email, String pass) async {
+    try {
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: pass,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        return "Password too weak";
+      } else if (e.code == 'email-already-in-use') {
+        return "Email already taken";
+      }
+    } catch (e) {
+      return e.toString();
+    }
+
+    //update display name
+    FirebaseAuth.instance.currentUser?.updateDisplayName(fName + lName);
+
+    return 'success';
   }
 }
