@@ -25,7 +25,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -64,17 +67,6 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBbY_L4YDarGANSWzVABmPwbNu9SsyHpd4',
-    appId: '1:946275082988:ios:c2db738d8bdc79ac043bc9',
-    messagingSenderId: '946275082988',
-    projectId: 'bronco-safe',
-    databaseURL: 'https://bronco-safe-default-rtdb.firebaseio.com',
-    storageBucket: 'bronco-safe.appspot.com',
-    iosClientId: '946275082988-muv971b7q3s393bk5plbffk449oir7oi.apps.googleusercontent.com',
-    iosBundleId: 'com.example.broncoSafe',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBbY_L4YDarGANSWzVABmPwbNu9SsyHpd4',
     appId: '1:946275082988:ios:c2db738d8bdc79ac043bc9',
     messagingSenderId: '946275082988',
