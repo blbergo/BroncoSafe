@@ -3,7 +3,11 @@ Name: main.dart
 Description: Startup page for the Bronco Safe Application on all platforms
 DMOD: 1/26/23
 */
+import 'dart:io';
+
 import 'package:bronco_safe/firebase_helpers.dart';
+import 'package:bronco_safe/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -29,7 +33,10 @@ class BroncoSafe extends StatelessWidget {
       theme: ThemeData(
           // This is the theme of your application.
           primaryColor: Colors.green.shade800),
-      home: const HomePage(title: 'Bronco Safe'),
+      routes: {
+        '/': (context) => HomePage(title: 'Bronco Safe'),
+        '/login': (context) => const LoginPage()
+      },
     );
   }
 }
@@ -40,6 +47,8 @@ class HomePage extends StatefulWidget {
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
+
+  setState() {}
 
   // This class is the configuration for the state. It holds the values (in this
   // case the title) provided by the parent (in this case the App widget) and
@@ -53,8 +62,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //state vars go here
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called
@@ -69,5 +76,17 @@ class _HomePageState extends State<HomePage> {
             Column(mainAxisAlignment: MainAxisAlignment.center, children: []),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    //used for changing to the login page when signed out
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!FirebaseHelpers.checkAuthState()) {
+        Navigator.pushReplacementNamed(context, "/login");
+      }
+    });
   }
 }
