@@ -27,6 +27,27 @@ class FirebaseHelpers {
     return allData;
   }
 
+  static Future<List<Object?>> getFilteredDataFromCollection(String collectionName, String filterBy, bool ascend) 
+  async {
+    dynamic ref;
+
+    switch(filterBy) 
+    {
+      // TODO: add more cases
+      case '':
+      break;
+      default:
+      ref = FirebaseFirestore.instance.collection(collectionName);
+      break;
+    }
+
+    QuerySnapshot qs = await ref.get();
+
+    final allData = qs.docs.map((doc) => doc.data()).toList();
+
+    return allData;
+  }
+
   /// Short function for checking whether a user is signed in, returns true
   /// or false depending on the current auth state
   static bool checkAuthState() {
