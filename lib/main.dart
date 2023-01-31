@@ -65,9 +65,8 @@ class _HomePageState extends State<HomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: []),
+        child:
+            Column(mainAxisAlignment: MainAxisAlignment.center, children: []),
       ),
     );
   }
