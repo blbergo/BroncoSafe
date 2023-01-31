@@ -34,6 +34,8 @@ class BroncoSafe extends StatelessWidget {
       theme: ThemeData(
           // This is the theme of your application.
           primaryColor: Colors.green.shade800),
+      //routes are like web-page addresses, by naming them we can access them
+      //using navigator
       routes: {
         '/': (context) => HomePage(title: 'Bronco Safe'),
         '/login': (context) => const LoginPage(),
@@ -50,6 +52,9 @@ class HomePage extends StatefulWidget {
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
 
+  //This is where we would initialize any state variables we want to display or
+  //use. In general, state vars are ones that change, or that we intend to change
+  //and update automatically when the UI is rebuilt
   setState() {}
 
   // This class is the configuration for the state. It holds the values (in this
@@ -63,6 +68,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+//kind of confusing, but this is where the actual content of our page is written
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
@@ -84,7 +90,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    //used for changing to the login page when signed out
+    //used for changing to the login page when signed out,or when users first
+    //download the app. *might be better to go straight to signup page with
+    //login option
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (!FirebaseHelpers.checkAuthState()) {
         Navigator.pushReplacementNamed(context, "/login");

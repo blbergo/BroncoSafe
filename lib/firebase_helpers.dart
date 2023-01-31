@@ -7,8 +7,8 @@ import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// Helper functions for using Firebase. All functions are async and require the
-/// use of await.
+/// Helper functions for using Firebase. Most functions are async and require 
+/// the use of await.
 class FirebaseHelpers {
   /// Returns all documents from a given [collectionName].When using this
   /// function, be sure to use await in order to get the data,
@@ -27,7 +27,8 @@ class FirebaseHelpers {
     return allData;
   }
 
-  /// Short function for checking whether a user is signed in
+  /// Short function for checking whether a user is signed in, returns true
+  /// or false depending on the current auth state
   static bool checkAuthState() {
     bool authState = false;
     if (FirebaseAuth.instance.currentUser != null) {
@@ -58,6 +59,8 @@ class FirebaseHelpers {
     return state;
   }
 
+  /// Helper function for creating a new user in firebase using [email] and
+  /// [pass]
   static Future<String> createUser(
       String fName, String lName, String email, String pass) async {
     try {
@@ -66,7 +69,9 @@ class FirebaseHelpers {
         email: email,
         password: pass,
       );
-    } on FirebaseAuthException catch (e) {
+    }
+    //error handling 
+    on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         return "Password too weak";
       } else if (e.code == 'email-already-in-use') {
@@ -76,7 +81,7 @@ class FirebaseHelpers {
       return e.toString();
     }
 
-    //update display name
+    //update display name in firebase
     FirebaseAuth.instance.currentUser?.updateDisplayName(fName + lName);
 
     return 'success';
