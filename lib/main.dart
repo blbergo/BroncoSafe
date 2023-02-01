@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:bronco_safe/firebase_helpers.dart';
 import 'package:bronco_safe/login.dart';
+import 'package:bronco_safe/map.dart';
 import 'package:bronco_safe/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,8 @@ class BroncoSafe extends StatelessWidget {
       routes: {
         '/': (context) => HomePage(title: 'Bronco Safe'),
         '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignupPage()
+        '/signup': (context) => const SignupPage(),
+        '/map': (context) => MapSample()
       },
     );
   }
@@ -93,10 +95,17 @@ class _HomePageState extends State<HomePage> {
     //used for changing to the login page when signed out,or when users first
     //download the app. *might be better to go straight to signup page with
     //login option
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+    //commented out for testing purposes on map
+     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (!FirebaseHelpers.checkAuthState()) {
-        Navigator.pushReplacementNamed(context, "/login");
+        //Navigator.pushReplacementNamed(context, "/login");
       }
+
+      Navigator.popAndPushNamed(context, "/map");
     });
+    
+
+    
   }
 }
