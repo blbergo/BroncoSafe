@@ -2,8 +2,6 @@
 // TODO: add a warning for people to not use their CPP passwords, and an un
 //affiliated notice
 
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
