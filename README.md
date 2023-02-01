@@ -10,7 +10,10 @@ A safety app inspired by Life360 for college students.
 
 ## Features
 
-- TBD
+- Live route sharing
+- Bluelight map routing
+- Friend system
+- Animal citing / crime map
 
 ## Resources
 
