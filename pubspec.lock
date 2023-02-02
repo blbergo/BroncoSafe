@@ -234,7 +234,7 @@ packages:
     source: hosted
     version: "2.2.5"
   google_polyline_algorithm:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_polyline_algorithm
       url: "https://pub.dartlang.org"

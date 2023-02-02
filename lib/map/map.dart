@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:bronco_safe/map/code_blue.dart';
 import 'package:bronco_safe/secrets.dart';
-import 'package:bronco_safe/userPos.dart';
+import 'package:bronco_safe/map/userPos.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_directions_api/google_directions_api.dart';
+import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({Key? key}) : super(key: key);
@@ -16,11 +17,13 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   Set<Polyline> geo_routes = {};
-  List<String> destinations = ["Disneyland", "Yorba Linda", "Anaheim"];
+  List<String> destinations = ["Cal Poly Pomona Parking Lot C, Pomona, CA 91768"];
 
   //TODO: add a state variable to represent destination;
 
   late GoogleMapController _controller;
+
+  Set<Marker> markers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,14 @@ class MapSampleState extends State<MapSample> {
         future: userPos.determinePositionAsLatLng(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
+            //set a marker for current user pos
+            markers.add(
+                Marker(markerId: MarkerId('userPos'), position: snapshot.data));
+
+            markers.add(
+                Marker(markerId: MarkerId('testMarker'), position: CodeBlue.BLUE_LIGHT_POS[0]));
             return GoogleMap(
+              markers: markers,
               mapType: MapType.normal,
               initialCameraPosition:
                   CameraPosition(target: snapshot.data, zoom: 19),
@@ -61,39 +71,52 @@ class MapSampleState extends State<MapSample> {
     //init google directions api
     DirectionsService.init(Secrets.GOOGLE_MAPS_API_KEY);
     final ds = DirectionsService();
-
-    //sub the origin out for user current location
     //add waypoints
+
     final request = DirectionsRequest(
         origin: await userPos.determinePositionAsString(),
         destination: destinations[0],
+        waypoints: CodeBlue.convertToDirections(),
+        optimizeWaypoints: true,
         travelMode: TravelMode.walking);
 
-    ds.route(request, (DirectionsResult response, DirectionsStatus? status) {
-      final data = response.routes!
-          .map((e) => e.legs!.map((e) => e.steps!.map((e) => e.startLocation)));
+    ds.route(request,
+        (DirectionsResult response, DirectionsStatus? status) async {
+      final routes = response.routes?.toList();
+      print(routes!.length);
 
-      List<LatLng> points = [];
+      List<LatLng> points = [await userPos.determinePositionAsLatLng()];
 
-      data.forEach((element) {
-        element.forEach((element) {
-          int index = 0;
-          element.forEach((element) {
-            index += 1;
-            points.add(LatLng(element!.latitude, element.longitude));
-          });
-        });
-        geo_routes.add(Polyline(
-            polylineId: PolylineId('1'), points: points, color: Colors.green));
+      markers.add(Marker(
+          markerId: const MarkerId('destination'),
+          position: points[points.length - 1]));
+      geo_routes.add(Polyline(
+          polylineId: PolylineId('route'),
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+          color: Colors.green,
+          points: await converToLatLng(
+              decodePolyline(routes![0].overviewPolyline!.points.toString()))));
 
-        setState(() {});
-      });
-
-       
+      setState(() {});
     });
 
+    //move camera to starting position
     _controller.animateCamera(CameraUpdate.newLatLngZoom(
         await userPos.determinePositionAsLatLng(), 19));
+  }
+
+  /// Function for converting a polyline string to LatLng coords
+  Future<List<LatLng>> converToLatLng(List<List<num>> overview) async {
+    List<LatLng> points = [];
+
+    points.add(await userPos.determinePositionAsLatLng());
+
+    overview.forEach((element) {
+      points.add(LatLng(element[0].toDouble(), element[1].toDouble()));
+    });
+
+    return points;
   }
 
   @override

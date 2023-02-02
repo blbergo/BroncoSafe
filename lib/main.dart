@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:bronco_safe/firebase_helpers.dart';
 import 'package:bronco_safe/login.dart';
-import 'package:bronco_safe/map.dart';
+import 'package:bronco_safe/map/map.dart';
 import 'package:bronco_safe/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
