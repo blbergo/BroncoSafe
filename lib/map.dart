@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bronco_safe/secrets.dart';
+import 'package:bronco_safe/userPos.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,28 +16,32 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   Set<Polyline> geo_routes = {};
+  List<String> destinations = ["Disneyland", "Yorba Linda", "Anaheim"];
 
   //TODO: add a state variable to represent destination;
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-
-  //TODO: update this to cal poly's location
-   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(34.0555994, -117.8214517),
-    zoom: 14.4746,
-  );
+  late GoogleMapController _controller;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Bronco Map")),
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
-        polylines: geo_routes,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
+      body: FutureBuilder(
+        future: userPos.determinePositionAsLatLng(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            return GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition:
+                  CameraPosition(target: snapshot.data, zoom: 19),
+              polylines: geo_routes,
+              onMapCreated: (GoogleMapController controller) {
+                _controller = controller;
+              },
+            );
+          } else {
+            return const Text("Map Error");
+          }
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -49,44 +54,6 @@ class MapSampleState extends State<MapSample> {
 
   //code for checking permission, will be moved to when the user first logs
   //in in the future
-  Future<LatLng> _determinePositionAsLatLng() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    Position pos = await Geolocator.getCurrentPosition();
-
-    return LatLng(pos.latitude, pos.longitude);
-  }
 
   void getDirections() async {
     print("init");
@@ -98,8 +65,8 @@ class MapSampleState extends State<MapSample> {
     //sub the origin out for user current location
     //add waypoints
     final request = DirectionsRequest(
-        origin: await _determinePositionAsLatLng().toString(),
-        destination: 'Yorba Linda',
+        origin: await userPos.determinePositionAsString(),
+        destination: destinations[0],
         travelMode: TravelMode.walking);
 
     ds.route(request, (DirectionsResult response, DirectionsStatus? status) {
@@ -116,13 +83,17 @@ class MapSampleState extends State<MapSample> {
             points.add(LatLng(element!.latitude, element.longitude));
           });
         });
-
         geo_routes.add(Polyline(
-            polylineId: PolylineId('1'), points: points, color: Colors.blue));
+            polylineId: PolylineId('1'), points: points, color: Colors.green));
 
         setState(() {});
       });
+
+       
     });
+
+    _controller.animateCamera(CameraUpdate.newLatLngZoom(
+        await userPos.determinePositionAsLatLng(), 19));
   }
 
   @override
