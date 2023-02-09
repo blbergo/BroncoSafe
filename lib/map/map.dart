@@ -17,7 +17,9 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   Set<Polyline> geo_routes = {};
-  List<String> destinations = ["Cal Poly Pomona Parking Lot C, Pomona, CA 91768"];
+  List<String> destinations = [
+    "Cal Poly Pomona Parking Lot C, Pomona, CA 91768"
+  ];
 
   //TODO: add a state variable to represent destination;
 
@@ -34,11 +36,21 @@ class MapSampleState extends State<MapSample> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             //set a marker for current user pos
-            markers.add(
-                Marker(markerId: MarkerId('userPos'), position: snapshot.data));
+            markers.add(Marker(
+              markerId: MarkerId('userPos'),
+              position: snapshot.data,
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueRed),
+            ));
 
-            markers.add(
-                Marker(markerId: MarkerId('testMarker'), position: CodeBlue.BLUE_LIGHT_POS[0]));
+            CodeBlue.BLUE_LIGHT_POS.forEach((element) {
+              markers.add(Marker(
+                  markerId: MarkerId(element.toString()),
+                  position: element,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueBlue)));
+            });
+
             return GoogleMap(
               markers: markers,
               mapType: MapType.normal,
@@ -50,7 +62,7 @@ class MapSampleState extends State<MapSample> {
               },
             );
           } else {
-            return const Text("Map Error");
+            return const Text("Loading...");
           }
         },
       ),
@@ -71,12 +83,14 @@ class MapSampleState extends State<MapSample> {
     //init google directions api
     DirectionsService.init(Secrets.GOOGLE_MAPS_API_KEY);
     final ds = DirectionsService();
-    //add waypoints
 
     final request = DirectionsRequest(
         origin: await userPos.determinePositionAsString(),
+        alternatives: true,
         destination: destinations[0],
-        waypoints: CodeBlue.convertToDirections(),
+        waypoints: CodeBlue.convertToDirections(
+            await userPos.determinePositionAsLatLng(),
+            LatLng(34.05879958060415, -117.81860161805734)),
         optimizeWaypoints: true,
         travelMode: TravelMode.walking);
 
@@ -85,11 +99,15 @@ class MapSampleState extends State<MapSample> {
       final routes = response.routes?.toList();
       print(routes!.length);
 
-      List<LatLng> points = [await userPos.determinePositionAsLatLng()];
+      markers.add(const Marker(         markerId: MarkerId('destination'),
+          //later take position a function argument
+          position: LatLng(34.05879958060415, -117.81860161805734)));
 
-      markers.add(Marker(
-          markerId: const MarkerId('destination'),
-          position: points[points.length - 1]));
+      CodeBlue.testMarkers(await userPos.determinePositionAsLatLng(),
+              LatLng(34.05879958060415, -117.81860161805734))
+          .forEach((element) {
+        markers.add(element);
+      });
       geo_routes.add(Polyline(
           polylineId: PolylineId('route'),
           startCap: Cap.roundCap,
